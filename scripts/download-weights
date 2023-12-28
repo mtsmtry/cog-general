@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+def download_models():
+    import subprocess
+    def run_command(command):
+        print(command)
+        subprocess.run(command, shell=True)
+
+    from pathlib import Path
+    if not Path("./models/w600k_r50.onnx").exists():
+        run_command("wget https://github.com/deepinsight/insightface/releases/download/v0.7/buffalo_l.zip")
+        run_command("unzip buffalo_l.zip -d ./models")
+    if not Path("./models/inswapper_128.onnx").exists():
+        run_command("wget -P ./models https://huggingface.co/ezioruan/inswapper_128.onnx/resolve/main/inswapper_128.onnx")
+    if not Path("./models/codeformer.pth").exists():
+        run_command("wget -P ./models https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth")
+
+def convert_models():
+    import torch
+    import onnx
+    from onnx2torch import convert
+    from onnx.numpy_helper import to_array
+
+    onnx_model = onnx.load("./models/inswapper_128.onnx")
+    torch_model = convert(onnx_model).eval()
+    torch.save(torch_model, "./models/inswapper_128.pt")
+    emap = torch.tensor(to_array(onnx_model.graph.initializer[-1]))
+    torch.save(emap, "./models/inswapper_128_emap.pt")
+
+    onnx_model = onnx.load("./models/w600k_r50.onnx")
+    torch_model = convert(onnx_model).eval()
+    torch.save(torch_model, "./models/w600k_r50.pt")
+
+    onnx_model = onnx.load("./models/det_10g.onnx")
+    torch_model = convert(onnx_model).eval()
+    torch.save(torch_model, "./models/det_10g.pt")
+
+download_models()
+convert_models()

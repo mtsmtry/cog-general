@@ -1,0 +1,22 @@
+build:
+  gpu: true
+  cuda: "11.1"
+  python_version: "3.11"
+  python_packages:
+    - torch
+    - numpy
+    - scikit-image
+    - kornia
+    - firebase-admin
+    - m3u8
+    - pillow
+    - b2sdk
+    - ffmpeg-python
+    - beautifulsoup4
+    - aioboto3
+    - aiofiles
+    - fastapi
+    - agraffe
+    - python-multipart
+    - onnx2torch
+predict: "predict.py:Predictor"
